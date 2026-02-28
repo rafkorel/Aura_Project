@@ -1,9 +1,10 @@
 from fastapi import FastAPI
-from pydantic import BaseModel  # <-- Добавь эту строчку вверху
+from pydantic import BaseModel
 
 app = FastAPI()
 
-# Добавь эту модель (класс) где-нибудь перед функцией
+users_db = []
+
 class NameRequest(BaseModel):
     name: str
 
@@ -16,5 +17,10 @@ def health():
     return {"status": "healthy", "version": "0.0.1"}
 
 @app.post("/hello")
-def say_hello(request: NameRequest):  # <-- Изменённая строка
-    return {"message": f"Привет, {request.name}!"}
+def say_hello(request: NameRequest):
+    users_db.append(request.name)
+    return {"message": f"Привет, {request.name}!", "all_users": users_db}
+
+@app.get("/users")
+def get_users():
+    return {"users": users_db}
